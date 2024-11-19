@@ -22,12 +22,12 @@ gyro_sensor = GyroSensor(Port.S4)
 touch_sensor = TouchSensor(Port.S2)
 ultrasonic_sensor = UltrasonicSensor(Port.S3)
 
-# TODO: Later add gyroscope motor and gyroscope
-
 ev3.light.on(Color.GREEN)
 ev3.screen.load_image(Image(ImageFile.EV3)) # ImageFile.Neutral
 
 maze = []
+
+calibrate_ultrasonic(head_motor, ultrasonic_sensor)
 
 # head_motor.run_angle(300, 90)
 
@@ -44,13 +44,3 @@ maze = []
 #     wait(1)
 # ev3.screen.load_image(Image(ImageFile.THUMBS_UP))
 # wait(1000)
-
-while True:
-    # print(ultrasonic_sensor.distance())
-    # if color_sensor.color() == Color.BLACK: # Reached the end if black is detected.
-    # if touch_sensor.pressed() == True:
-    #     print("End reached.")
-    #     ev3.screen.load_image(Image(ImageFile.THUMBS_UP))
-    #     ev3.light.off()
-    #     sys.exit(0)
-    wait(200)
