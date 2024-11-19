@@ -17,6 +17,32 @@ def motors_on(left_motor,right_motor,ultrasonic_sensor):
     left_motor.brake()
     right_motor.brake()
 
+def turn_base(left_motor,right_motor,gyro_sensor,degrees=90,Clockwise=True):
+    if Clockwise == True:
+        left_motor.run(40)
+        right_motor.run(-20)
+    if Clockwise == False:
+        left_motor.run(-40)
+        right_motor.run(20)
+    while True :
+        angle = gyro_sensor.angle()
+        print("Current angle is", str(angle) + "°.")
+        if Clockwise == True:
+            if angle <= -degrees:
+                left_motor.brake()
+                right_motor.brake()
+                # break
+        else:
+            if angle >= degrees:
+                left_motor.brake()
+                right_motor.brake()
+                # break
+        wait(1)
+
+
+
+
+
 def calibrate_ultrasonic(head_motor, ultrasonic_sensor):
     # Turn the head in such way that the distance becomes as small as possible between the ultrasonic sensor and the wall.
     max_rotation_angle = 160      # Maximum angle to rotate the head
