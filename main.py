@@ -46,7 +46,7 @@ maze = []
 # wait(1000)
 
 while True:
-    print(ultrasonic_sensor.distance())
+    # print(ultrasonic_sensor.distance())
     # if color_sensor.color() == Color.BLACK: # Reached the end if black is detected.
     # if touch_sensor.pressed() == True:
     #     print("End reached.")
