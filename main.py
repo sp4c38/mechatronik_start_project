@@ -22,75 +22,71 @@ gyro_sensor = GyroSensor(Port.S4)
 touch_sensor = TouchSensor(Port.S2)
 ultrasonic_sensor = UltrasonicSensor(Port.S1)
 
-# # TODO: Later add gyroscope motor and gyroscope
-# ev3.light.on(Color.GREEN)
-# ev3.screen.load_image(Image(ImageFile.EV3)) # ImageFile.Neutral
-# maze = []
+# TODO: Later add gyroscope motor and gyroscope
+ev3.light.on(Color.GREEN)
+ev3.screen.load_image(Image(ImageFile.EV3)) # ImageFile.Neutral
+maze = []
 
-# ##############################################################
+##############################################################
 
-# turn_base(left_motor,right_motor,gyro_sensor,Clockwise=False)
+turn_base(left_motor,right_motor,gyro_sensor,Clockwise=False)
 
-# ###############################################################
+###############################################################
 
-# while(not touch_sensor.pressed()):
-#         wait(200)
+while(not touch_sensor.pressed()):
+        wait(200)
 
-# while True:
-#     calibrate_ultrasonic(head_motor,ultrasonic_sensor)
+calibrate_ultrasonic(head_motor,ultrasonic_sensor)
 
-#     color_sensor.color()
+while True:
 
-#     if color_sensor.color() != Color.BLACK:
-#         motors_on(left_motor,right_motor,ultrasonic_sensor)
+    color_sensor.color()
 
-#         # while(True):
-#         #     color_sensor.color()
-#         #     print(color_sensor.color())
-#         #     if color_sensor.color() == Color.BLACK:
-#         #         right_motor.hold()
-#         #         left_motor.hold()
-#         #         break
-#         #     wait(100)
+    if color_sensor.color() != Color.BLACK:
 
-#         head_motor.run_angle(300, 90)
+        motors_on(left_motor,right_motor,ultrasonic_sensor)
 
-#         gyro_sensor.reset_angle(0)
-#         left_motor.run(40)
-#         right_motor.run(-40)
+        head_motor.run_angle(300, 90)
 
-#         while True:
-#             angle = gyro_sensor.angle()
-#             print("Current angle is", str(angle) + "°.")
-#             if angle <= -90:
-#                 left_motor.brake()
-#                 right_motor.brake()
-#                 break
-#             wait(1)
-#         ev3.screen.load_image(Image(ImageFile.THUMBS_UP))
-#         wait(1000)
+        gyro_sensor.reset_angle(0)
+        left_motor.run(40)
+        right_motor.run(-40)
 
-#     else: # Reached the end if black is detected.
-#         print("End reached.")
+        while True:
+            angle = gyro_sensor.angle()
+            print("Current angle is", str(angle) + "°.")
+            if angle <= -90:
+                left_motor.brake()
+                right_motor.brake()
+                break
+            wait(1)
+        ev3.screen.load_image(Image(ImageFile.THUMBS_UP))
+        wait(1000)
+
+    else: # Reached the end if black is detected.
+        print("End reached.")
         
-#         ev3.screen.load_image(Image(ImageFile.THUMBS_UP))
-#         ev3.light.off()
-#         sys.exit(0)
-#     wait(200)
-ev3.speaker.set_volume(7)
+        ev3.screen.load_image(Image(ImageFile.THUMBS_UP))
+        ev3.light.off()
+        sys.exit(0)
+    wait(200)
 
-party_gewinn_melodie = [
-    # Abschnitt 1: "Yeah! Wir haben gewonnen"
-    'C4/8', 'E4/8', 'G4/4', 'C5/8', 'G4/8', 'E4/4', 'C4/2',
+################# music
+
+# ev3.speaker.set_volume(100)
+
+# party_gewinn_melodie = [
+#     # Abschnitt 1: "Yeah! Wir haben gewonnen"
+#     'C4/8', 'E4/8', 'G4/4', 'C5/8', 'G4/8', 'E4/4', 'C4/2',
     
-    # Abschnitt 2: "Feiern wir die Nacht"
-    'D4/8', 'F4/8', 'A4/4', 'D5/8', 'A4/8', 'F4/4', 'D4/2',
+#     # Abschnitt 2: "Feiern wir die Nacht"
+#     'D4/8', 'F4/8', 'A4/4', 'D5/8', 'A4/8', 'F4/4', 'D4/2',
     
-    # Abschnitt 3: "Freude und Spaß"
-    'E4/8', 'G4/8', 'B4/4', 'E5/8', 'B4/8', 'G4/4', 'E4/2',
+#     # Abschnitt 3: "Freude und Spaß"
+#     'E4/8', 'G4/8', 'B4/4', 'E5/8', 'B4/8', 'G4/4', 'E4/2',
     
-    # Abschnitt 4: "Gemeinsam sind wir stark"
-    'F4/8', 'A4/8', 'C5/4', 'F5/8', 'C5/8', 'A4/4', 'F4/2',
+#     # Abschnitt 4: "Gemeinsam sind wir stark"
+#     'F4/8', 'A4/8', 'C5/4', 'F5/8', 'C5/8', 'A4/4', 'F4/2',
     
-]
-ev3.speaker.play_notes(party_gewinn_melodie, tempo=200)
+# ]
+# ev3.speaker.play_notes(party_gewinn_melodie, tempo=200)
