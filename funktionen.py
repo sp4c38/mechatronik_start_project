@@ -4,18 +4,70 @@
 from pybricks.media.ev3dev import SoundFile, ImageFile
 from pybricks.parameters import Color, Stop
 from pybricks.tools import wait, StopWatch, DataLog
+
+def measure_3_distances(head_motor, ultrasonic_sensor):
+    distances = {"right": None, "front": None, "left": None}
+    distances["left"] = ultrasonic_sensor.distance()
+    turn_head(head_motor, degrees=90)
+    distances["front"] = ultrasonic_sensor.distance()
+    turn_head(head_motor, degrees=90)
+    distances["right"] = ultrasonic_sensor.distance()
+    print("Distances are {}.".format(distances))
+    turn_head(head_motor, degrees=-90, wait=False)
+    return distances
+
+def turn_base(left_motor, right_motor, gyro_sensor, speed=300, degrees=90, adjustment_turn=False):
+    """
+    First make a quick 90° turn which will result in an actual turn of something like 105°.
+    Then make a slow turn to correct for the misalignment. The slow turn is relatively accurat because the robot doesn't have that much momentum.
+    """
+    print("Turning {}°.".format(degrees))
+    gyro_sensor.reset_angle(0)
+    turn_clockwise = degrees > 0
+    if turn_clockwise:
+        # Turn clockwise
+        left_motor.run(speed) #40)
+        right_motor.run(-speed) #-20)
+    else:
+        # Turn anticlockwise
+        left_motor.run(-speed) #-40)
+        right_motor.run(speed) #20)
+    
+    while True:
+        angle = gyro_sensor.angle()
+        # print("Current angle is {}°.".format(str(angle)))
+        if abs(angle) >= abs(degrees):
+            left_motor.hold()
+            right_motor.hold()
+            break
         
-def motors_on(left_motor,right_motor,ultrasonic_sensor):
+        wait(1)
+
+    wait(200)
+    if not adjustment_turn:
+        adjustment = abs(gyro_sensor.angle()) - abs(degrees)
+        print("Adjusting turn by {}°.".format(adjustment))
+        if turn_clockwise:
+            adjustment *= -1
+        turn_base(left_motor, right_motor, gyro_sensor, speed=40, degrees=adjustment, adjustment_turn=True)
+
+def motors_on(left_motor, right_motor, ultrasonic_sensor):
     left_motor.run(-150)
     right_motor.run(-150)
+    r = 0
     while(True):
         distance = ultrasonic_sensor.distance()
-        stop =  distance - 60
-        if stop<=0 :
+        stop =  distance - 40
+        if stop <= 0:
+            print("Stopped because distance is {}.".format(distance))
             break
-        wait(0.1)
-    left_motor.brake()
-    right_motor.brake()
+        wait(50)
+    left_motor.hold()
+    right_motor.hold()
+    
+
+def turn_head(head_motor, degrees=90, wait=True):
+    head_motor.run_angle(150, rotation_angle=degrees, wait=wait)
 
 def turn_base(left_motor,right_motor,gyro_sensor,degrees=90,Clockwise=True):
     if Clockwise == True:
