@@ -126,7 +126,7 @@ def motors_off(left_motor, right_motor, stop=Stop.HOLD):
         left_motor.brake()
         right_motor.brake()
 
-def motors_on(left_motor, right_motor, ultrasonic_sensor, color_sensor, speed=400, rotation_angle=-610, check_front_distance=True):
+def motors_on(left_motor, right_motor, ultrasonic_sensor, color_sensor, speed=400, rotation_angle=-615, check_front_distance=True):
     # Continuously check if there is an approaching wall in front of the robot. If yes, make the robot halt at a certain distance from this wall.
     # Returns: True if the robot reached the goal (crossed the black line). False if not.
     left_motor.run_angle(speed,rotation_angle,wait=False)
@@ -143,7 +143,7 @@ def motors_on(left_motor, right_motor, ultrasonic_sensor, color_sensor, speed=40
                 motors_off(left_motor, right_motor, stop=Stop.BRAKE)
                 return True
             wait(1)
-    
+
     return False
 
 def turn_head(head_motor, degrees=90, wait=True):
@@ -187,3 +187,6 @@ def calibrate_ultrasonic(head_motor, ultrasonic_sensor):
     print("Rotating back to minimum angle: {:.2f} degrees".format(min_angle))
     head_motor.run_angle(speed=150, rotation_angle=rotation_needed, then=Stop.HOLD)
     print("Calibration complete. Minimum distance: {:.2f} at angle {:.2f}".format(min_distance, min_angle))
+
+# Check the left and right distance. Evaluate which distance is bigger. The robot needs to adjust for that distance and needs to try to drive in the middle of the field. This only works if there is a left and right wall.
+# def calibrate_to_field_center(left_motor, right_motor):
