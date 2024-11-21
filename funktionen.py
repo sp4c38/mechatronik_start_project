@@ -69,10 +69,9 @@ def turn_base(left_motor, right_motor, gyro_sensor, speed=300, degrees=90, adjus
     
     while True:
         angle = gyro_sensor.angle()
-        # print("Current angle is {}°.".format(str(angle)))
+        print("Current angle is {}°.".format(str(angle)))
         if abs(angle) >= abs(degrees):
-            left_motor.hold()
-            right_motor.hold()
+            motors_off(left_motor, right_motor)
             break
         
         wait(1)
@@ -85,6 +84,14 @@ def turn_base(left_motor, right_motor, gyro_sensor, speed=300, degrees=90, adjus
             adjustment *= -1
         turn_base(left_motor, right_motor, gyro_sensor, speed=40, degrees=adjustment, adjustment_turn=True)
 
+def motors_off(left_motor, right_motor, stop=Stop.HOLD):
+    if stop == Stop.HOLD:
+        left_motor.hold()
+        right_motor.hold()
+    elif stop == Stop.BRAKE:
+        left_motor.brake()
+        right_motor.brake()
+
 def motors_on(left_motor, right_motor, ultrasonic_sensor, color_sensor, speed=400, rotation_angle=-610, check_front_distance=True):
     # Continuously check if there is an approaching wall in front of the robot. If yes, make the robot halt at a certain distance from this wall.
     # Returns: True if the robot reached the goal (crossed the black line). False if not.
@@ -94,14 +101,12 @@ def motors_on(left_motor, right_motor, ultrasonic_sensor, color_sensor, speed=40
     if check_front_distance:
         while abs(right_motor.speed()) > 0:
             front_wall_distance = ultrasonic_sensor.distance()
-            if check_front_distance and (front_wall_distance <= 57):
+            if check_front_distance and (front_wall_distance <= 60):
                 print("Front distance limit reached. Stopping.")
-                left_motor.brake()
-                right_motor.brake()
+                motors_off(left_motor, right_motor)
                 return False
             if color_sensor.color() == Color.BLACK:
-                left_motor.brake()
-                right_motor.brake()
+                motors_off(left_motor, right_motor, stop=Stop.BRAKE)
                 return True
             wait(1)
     
