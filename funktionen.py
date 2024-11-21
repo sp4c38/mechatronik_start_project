@@ -7,14 +7,13 @@ from pybricks.tools import wait, StopWatch, DataLog
 
 def measure_3_distances(head_motor, ultrasonic_sensor):
     distances = {"right": None, "front": None, "left": None}
-    distances["left"] = ultrasonic_sensor.distance()
-    turn_head(head_motor, degrees=90)
     distances["front"] = ultrasonic_sensor.distance()
-    turn_head(head_motor, degrees=90)
+    turn_head(head_motor, degrees=-90)
+    distances["left"] = ultrasonic_sensor.distance()
+    turn_head(head_motor, degrees=180)
     distances["right"] = ultrasonic_sensor.distance()
     print("Distances are {}.".format(distances))
-    turn_head(head_motor, degrees=-180, wait=True)
-    # calibrate_ultrasonic(head_motor, ultrasonic_sensor)
+    turn_head(head_motor, degrees=-90, wait=False)
     return distances
 
 # def measure_3_distances(head_motor, ultrasonic_sensor,left_motor,right_motor,speed=150,rotation_angle=618):
@@ -39,9 +38,9 @@ def measure_3_distances(head_motor, ultrasonic_sensor):
     
 #     return distances
 
-def go_to_start_position(left_motor, right_motor, head_motor, ultrasonic_sensor):
-    goal_distance = 185 # in mm
-    motors_on(left_motor, right_motor, speed=100)
+def go_to_start_position(left_motor, right_motor, ultrasonic_sensor, color_sensor, head_motor):
+    goal_distance = 175 # in mm
+    motors_on(left_motor, right_motor, ultrasonic_sensor, color_sensor, speed=100, check_front_distance=False)
 
     while (goal_distance - ultrasonic_sensor.distance()) >= 0:
         wait(1)
@@ -49,7 +48,7 @@ def go_to_start_position(left_motor, right_motor, head_motor, ultrasonic_sensor)
     left_motor.brake()
     right_motor.brake()
 
-    turn_head(head_motor, degrees=90)
+    turn_head(head_motor, degrees=180)
 
 def turn_base(left_motor, right_motor, gyro_sensor, speed=300, degrees=90, adjustment_turn=False):
     """
@@ -86,10 +85,27 @@ def turn_base(left_motor, right_motor, gyro_sensor, speed=300, degrees=90, adjus
             adjustment *= -1
         turn_base(left_motor, right_motor, gyro_sensor, speed=40, degrees=adjustment, adjustment_turn=True)
 
-def motors_on(left_motor, right_motor, speed=400, rotation_angle=-608):
+def motors_on(left_motor, right_motor, ultrasonic_sensor, color_sensor, speed=400, rotation_angle=-610, check_front_distance=True):
+    # Continuously check if there is an approaching wall in front of the robot. If yes, make the robot halt at a certain distance from this wall.
+    # Returns: True if the robot reached the goal (crossed the black line). False if not.
     left_motor.run_angle(speed,rotation_angle,wait=False)
     right_motor.run_angle(speed,rotation_angle,wait=False)
-    wait(300)
+    wait(200)
+    if check_front_distance:
+        while abs(right_motor.speed()) > 0:
+            front_wall_distance = ultrasonic_sensor.distance()
+            if check_front_distance and (front_wall_distance <= 57):
+                print("Front distance limit reached. Stopping.")
+                left_motor.brake()
+                right_motor.brake()
+                return False
+            if color_sensor.color() == Color.BLACK:
+                left_motor.brake()
+                right_motor.brake()
+                return True
+            wait(1)
+    
+    return False
 
 def turn_head(head_motor, degrees=90, wait=True):
     head_motor.run_angle(300, rotation_angle=degrees, then=Stop.HOLD, wait=wait)

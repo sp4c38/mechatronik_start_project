@@ -27,30 +27,18 @@ calibrate_ultrasonic(head_motor,ultrasonic_sensor)
 while touch_sensor.pressed() == False:
     wait(1)
 
-go_to_start_position(left_motor, right_motor, head_motor, ultrasonic_sensor)
+go_to_start_position(left_motor, right_motor, ultrasonic_sensor, color_sensor, head_motor)
 
 while True:
     distances = measure_3_distances(head_motor, ultrasonic_sensor)
     maximum_distance = max(distances, key=distances.get)
     if maximum_distance == "right":
-        turn_base(left_motor, right_motor, gyro_sensor, degrees=92)
-        motors_on(left_motor, right_motor)
+        turn_base(left_motor, right_motor, gyro_sensor, degrees=94)
     elif maximum_distance == "left":
-        turn_base(left_motor, right_motor, gyro_sensor, degrees=-92)
-        motors_on(left_motor, right_motor)
-    elif maximum_distance == "front":
-        motors_on(left_motor, right_motor)
+        turn_base(left_motor, right_motor, gyro_sensor, degrees=-94)
 
-    stop = False
-    while abs(right_motor.speed()) > 0:
-        if color_sensor.color() == Color.BLACK:
-            stop = True
-            left_motor.brake()
-            right_motor.brake()
-            break
-        wait(10)
-
-    if stop:
+    finished = motors_on(left_motor, right_motor, ultrasonic_sensor, color_sensor)
+    if finished:
         break
 
 print("End reached.")
