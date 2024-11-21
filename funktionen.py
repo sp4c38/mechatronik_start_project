@@ -16,6 +16,28 @@ def measure_3_distances(head_motor, ultrasonic_sensor):
     turn_head(head_motor, degrees=-90, wait=False)
     return distances
 
+# def measure_3_distances(head_motor, ultrasonic_sensor,left_motor,right_motor,speed=150,rotation_angle=618):
+#     distances = {"right": None, "front": None, "left": None}
+    
+#     distances["left"] = ultrasonic_sensor.distance()
+    
+#     turn_head(head_motor, degrees=90)
+#     distances["front"] = ultrasonic_sensor.distance()
+    
+#     turn_head(head_motor, degrees=90)
+#     distances["right"] = ultrasonic_sensor.distance()
+    
+#     print("Distances are {}.".format(distances))
+    
+#     turn_head(head_motor, degrees=-90, wait=False)
+    
+#     if all(d is not None and d < 250 for d in distances.values()):
+#         print("Obstacle detected! Moving backward.")
+#         left_motor.run_angle(speed,rotation_angle,wait=False)
+#         right_motor.run_angle(speed,rotation_angle,wait=True)  
+    
+#     return distances
+
 def turn_base(left_motor, right_motor, gyro_sensor, speed=300, degrees=90, adjustment_turn=False):
     """
     First make a quick 90° turn which will result in an actual turn of something like 105°.
@@ -51,19 +73,25 @@ def turn_base(left_motor, right_motor, gyro_sensor, speed=300, degrees=90, adjus
             adjustment *= -1
         turn_base(left_motor, right_motor, gyro_sensor, speed=40, degrees=adjustment, adjustment_turn=True)
 
-def motors_on(left_motor, right_motor, ultrasonic_sensor):
-    left_motor.run(-150)
-    right_motor.run(-150)
-    r = 0
-    while(True):
-        distance = ultrasonic_sensor.distance()
-        stop =  distance - 40
-        if stop <= 0:
-            print("Stopped because distance is {}.".format(distance))
-            break
-        wait(50)
+def motors_on(left_motor, right_motor,speed=150,rotation_angle=-618,wait=False):
+
+    left_motor.run_angle(speed,rotation_angle,wait=False)
+    right_motor.run_angle(speed,rotation_angle,wait=True)
+
     left_motor.hold()
     right_motor.hold()
+
+    # r = 0
+    # run_angle
+    # while(True):
+    #     distance = ultrasonic_sensor.distance()
+    #     stop =  distance - 40
+    #     if stop <= 0:
+    #         print("Stopped because distance is {}.".format(distance))
+    #         break
+    #     wait(50)
+    # left_motor.hold()
+    # right_motor.hold()
     
 
 def turn_head(head_motor, degrees=90, wait=True):
