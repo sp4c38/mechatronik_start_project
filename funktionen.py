@@ -138,44 +138,11 @@ def calibrate_ultrasonic(head_motor, ultrasonic_sensor):
     head_motor.run_angle(speed=150, rotation_angle=rotation_needed, then=Stop.HOLD)
     print("Calibration complete. Minimum distance: {:.2f} at angle {:.2f}".format(min_distance, min_angle))
 
-# Check the left and right distance. Evaluate which distance is bigger. The robot needs to adjust for that distance and needs to try to drive in the middle of the field. This only works if there is a left and right wall.
 def calibrate_to_field_center(left_motor, right_motor, head_motor, ultrasonic_sensor, gyro_sensor):
-    # Measure left
     turn_head(head_motor, degrees=-90)
-    left_distance = ultrasonic_sensor.distance()
-    turn_head(head_motor, degrees=180)
-    right_distance = ultrasonic_sensor.distance() - 106
-
-    if not (left_distance < 250 and right_distance < 250):
-        return
-    
-    f = 70
-    c = (0.5*(left_distance+right_distance))-left_distance
-    alpha = c / f
-    alpha *= 2
-
-    turn_base(left_motor, right_motor, gyro_sensor, degrees=alpha)
-    m = math.sqrt((c**2)+(f**2))
-
-    d = 55.16
-    r = d/2
-    u = math.pi*d
-    n360 = m//u
-    rest_m = m - n360*u
-    rest_winkel = 360*(rest_m/u)
-
-    rotation_angle = 360*n360 + rest_winkel
-
-    left_motor.run_angle(200, rotation_angle, wait=False)
-    right_motor.run_angle(200, rotation_angle, wait=False)
-
-    turn_base(left_motor, right_motor, gyro_sensor, degrees=-alpha/2)
-
-    n360_2 = f//u
-    rest_f = f - n360_2*u
-    rest_winkel = 360*(rest_f/u)
-
-    rotation_angle_2 = 360*n360_2 + rest_winkel
-
-    left_motor.run_angle(200, -rotation_angle, wait=False)
-    right_motor.run_angle(200, -rotation_angle, wait=False)
+    calibrate_ultrasonic(head_motor, ultrasonic_sensor)
+    adjustment_angle = head_motor.angle()+5
+    turn_base(left_motor, right_motor, gyro_sensor, degrees=adjustment_angle)
+    turn_head(head_motor, degrees=-adjustment_angle-40)
+    calibrate_ultrasonic(head_motor, ultrasonic_sensor)
+    turn_head(head_motor, degrees=90)
