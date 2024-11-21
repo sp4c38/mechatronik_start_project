@@ -13,35 +13,45 @@ from funktionen import *
 
 # Hier wird die angeschlossene Hardware definiert und konfiguriert
 ev3 = EV3Brick()
-left_motor = Motor(Port.A)
-right_motor = Motor(Port.D)
+left_motor = Motor(Port.D)
+right_motor = Motor(Port.B)
 head_motor = Motor(Port.C)
 
-color_sensor = ColorSensor(Port.S3)
+color_sensor = ColorSensor(Port.S2)
 gyro_sensor = GyroSensor(Port.S4)
-touch_sensor = TouchSensor(Port.S2)
-ultrasonic_sensor = UltrasonicSensor(Port.S1)
-
-# measure_3_distances(head_motor, ultrasonic_sensor,left_motor,right_motor)
-
-motors_on(left_motor,right_motor)
+touch_sensor = TouchSensor(Port.S1)
+ultrasonic_sensor = UltrasonicSensor(Port.S3)
 
 calibrate_ultrasonic(head_motor,ultrasonic_sensor)
 
-loops = 0
-while (color_sensor.color() != Color.BLACK):
+while touch_sensor.pressed() == False:
+    wait(1)
+
+go_to_start_position(left_motor, right_motor, head_motor, ultrasonic_sensor)
+
+while True:
     distances = measure_3_distances(head_motor, ultrasonic_sensor)
     maximum_distance = max(distances, key=distances.get)
     if maximum_distance == "right":
-        turn_base(left_motor, right_motor, gyro_sensor, degrees=90)
+        turn_base(left_motor, right_motor, gyro_sensor, degrees=92)
         motors_on(left_motor, right_motor)
     elif maximum_distance == "left":
-        turn_base(left_motor, right_motor, gyro_sensor, degrees=-90)
+        turn_base(left_motor, right_motor, gyro_sensor, degrees=-92)
         motors_on(left_motor, right_motor)
     elif maximum_distance == "front":
         motors_on(left_motor, right_motor)
-    
-    loops += 1
+
+    stop = False
+    while abs(right_motor.speed()) > 0:
+        if color_sensor.color() == Color.BLACK:
+            stop = True
+            left_motor.brake()
+            right_motor.brake()
+            break
+        wait(10)
+
+    if stop:
+        break
 
 print("End reached.")
 ev3.screen.load_image(Image(ImageFile.THUMBS_UP))
