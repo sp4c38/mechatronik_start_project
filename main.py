@@ -33,9 +33,9 @@ while True:
     distances = measure_3_distances(head_motor, ultrasonic_sensor)
     maximum_distance = max(distances, key=distances.get)
     if maximum_distance == "right":
-        turn_base(left_motor, right_motor, gyro_sensor, degrees=91)
+        turn_base(left_motor, right_motor, gyro_sensor, degrees=90)
     elif maximum_distance == "left":
-        turn_base(left_motor, right_motor, gyro_sensor, degrees=-91)
+        turn_base(left_motor, right_motor, gyro_sensor, degrees=-90)
 
     finished = motors_on(left_motor, right_motor, ultrasonic_sensor, color_sensor)
     if finished:
