@@ -1,6 +1,8 @@
 # In dieser Datei können eigene Funktionen definiert werden. Es können auch weitere Dateien angelegt werden, die dann in main.py importiert werden müssen
 
 # Hier werden die erforderlichen Software-Module importiert. Dabei sollte nichts verändert werden
+import math
+
 from pybricks.media.ev3dev import SoundFile, ImageFile
 from pybricks.parameters import Color, Stop
 from pybricks.tools import wait, StopWatch, DataLog
@@ -18,59 +20,7 @@ def measure_3_distances(head_motor, ultrasonic_sensor):
 
     print("Distances are {}.".format(distances))
 
-    if all(d < 250 for d in distances.values()):
-        print("Obstacle detected! Moving backward.")
-        left_motor.run_angle(speed=-400,rotation_angle=615,wait=False)
-        right_motor.run_angle(speed=-400,rotation_angle=615,wait=True)  
-
-        left_motor.brake()
-        right_motor.brake()
-        measure_2_distances()
-
     return distances
-
-def measure_2_distances(head_motor, ultrasonic_sensor,left_motor,right_motor,gyro_sensor):
-    distances = {"right": None, "left": None}
-    
-    distances["left"] = ultrasonic_sensor.distance()
-    turn_head(head_motor, degrees=180)
-
-    distances["right"] = ultrasonic_sensor.distance()
-    turn_head(head_motor, degrees=-90, wait=False)
-
-    maximum_distance = max(distances, key=distances.get)
-
-    if maximum_distance == "right":
-        turn_base(left_motor, right_motor, gyro_sensor, degrees=91)
-    elif maximum_distance == "left":
-        turn_base(left_motor, right_motor, gyro_sensor, degrees=-91)
-
-    finished = motors_on(left_motor, right_motor, ultrasonic_sensor, color_sensor)
-    if finished:
-        break
-    print("Distances are {}.".format(distances))
-
-# def measure_3_distances(head_motor, ultrasonic_sensor,left_motor,right_motor,speed=150,rotation_angle=618):
-#     distances = {"right": None, "front": None, "left": None}
-    
-#     distances["left"] = ultrasonic_sensor.distance()
-    
-#     turn_head(head_motor, degrees=90)
-#     distances["front"] = ultrasonic_sensor.distance()
-    
-#     turn_head(head_motor, degrees=90)
-#     distances["right"] = ultrasonic_sensor.distance()
-    
-#     print("Distances are {}.".format(distances))
-    
-#     turn_head(head_motor, degrees=-90, wait=False)
-    
-#     if all(d is not None and d < 250 for d in distances.values()):
-#         print("Obstacle detected! Moving backward.")
-#         left_motor.run_angle(speed,rotation_angle,wait=False)
-#         right_motor.run_angle(speed,rotation_angle,wait=True)  
-    
-#     return distances
 
 def go_to_start_position(left_motor, right_motor, ultrasonic_sensor, color_sensor, head_motor):
     goal_distance = 175 # in mm
@@ -189,4 +139,43 @@ def calibrate_ultrasonic(head_motor, ultrasonic_sensor):
     print("Calibration complete. Minimum distance: {:.2f} at angle {:.2f}".format(min_distance, min_angle))
 
 # Check the left and right distance. Evaluate which distance is bigger. The robot needs to adjust for that distance and needs to try to drive in the middle of the field. This only works if there is a left and right wall.
-# def calibrate_to_field_center(left_motor, right_motor):
+def calibrate_to_field_center(left_motor, right_motor, head_motor, ultrasonic_sensor, gyro_sensor):
+    # Measure left
+    turn_head(head_motor, degrees=-90)
+    left_distance = ultrasonic_sensor.distance()
+    turn_head(head_motor, degrees=180)
+    right_distance = ultrasonic_sensor.distance() - 106
+
+    if not (left_distance < 250 and right_distance < 250):
+        return
+    
+    f = 70
+    c = (0.5*(left_distance+right_distance))-left_distance
+    alpha = c / f
+    alpha *= 2
+
+    turn_base(left_motor, right_motor, gyro_sensor, degrees=alpha)
+    m = math.sqrt((c**2)+(f**2))
+
+    d = 55.16
+    r = d/2
+    u = math.pi*d
+    n360 = m//u
+    rest_m = m - n360*u
+    rest_winkel = 360*(rest_m/u)
+
+    rotation_angle = 360*n360 + rest_winkel
+
+    left_motor.run_angle(200, rotation_angle, wait=False)
+    right_motor.run_angle(200, rotation_angle, wait=False)
+
+    turn_base(left_motor, right_motor, gyro_sensor, degrees=-alpha/2)
+
+    n360_2 = f//u
+    rest_f = f - n360_2*u
+    rest_winkel = 360*(rest_f/u)
+
+    rotation_angle_2 = 360*n360_2 + rest_winkel
+
+    left_motor.run_angle(200, -rotation_angle, wait=False)
+    right_motor.run_angle(200, -rotation_angle, wait=False)
