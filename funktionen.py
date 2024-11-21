@@ -9,12 +9,46 @@ def measure_3_distances(head_motor, ultrasonic_sensor):
     distances = {"right": None, "front": None, "left": None}
     distances["front"] = ultrasonic_sensor.distance()
     turn_head(head_motor, degrees=-90)
+
     distances["left"] = ultrasonic_sensor.distance()
     turn_head(head_motor, degrees=180)
+
     distances["right"] = ultrasonic_sensor.distance()
-    print("Distances are {}.".format(distances))
     turn_head(head_motor, degrees=-90, wait=False)
+
+    print("Distances are {}.".format(distances))
+
+    if all(d < 250 for d in distances.values()):
+        print("Obstacle detected! Moving backward.")
+        left_motor.run_angle(speed=-400,rotation_angle=615,wait=False)
+        right_motor.run_angle(speed=-400,rotation_angle=615,wait=True)  
+
+        left_motor.brake()
+        right_motor.brake()
+        measure_2_distances()
+
     return distances
+
+def measure_2_distances(head_motor, ultrasonic_sensor,left_motor,right_motor,gyro_sensor):
+    distances = {"right": None, "left": None}
+    
+    distances["left"] = ultrasonic_sensor.distance()
+    turn_head(head_motor, degrees=180)
+
+    distances["right"] = ultrasonic_sensor.distance()
+    turn_head(head_motor, degrees=-90, wait=False)
+
+    maximum_distance = max(distances, key=distances.get)
+
+    if maximum_distance == "right":
+        turn_base(left_motor, right_motor, gyro_sensor, degrees=91)
+    elif maximum_distance == "left":
+        turn_base(left_motor, right_motor, gyro_sensor, degrees=-91)
+
+    finished = motors_on(left_motor, right_motor, ultrasonic_sensor, color_sensor)
+    if finished:
+        break
+    print("Distances are {}.".format(distances))
 
 # def measure_3_distances(head_motor, ultrasonic_sensor,left_motor,right_motor,speed=150,rotation_angle=618):
 #     distances = {"right": None, "front": None, "left": None}
