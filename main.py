@@ -30,23 +30,27 @@ maze = []
 #         wait(200)
 
 calibrate_ultrasonic(head_motor,ultrasonic_sensor)
+# print(measure_3_distances(head_motor, ultrasonic_sensor))
+# motors_on(left_motor, right_motor, ultrasonic_sensor)
 
-# while True:
-if color_sensor.color() == Color.BLACK:
-    print("End reached.")
+loops = 0
+while (color_sensor.color() != Color.BLACK):
+    distances = measure_3_distances(head_motor, ultrasonic_sensor)
+    maximum_distance = max(distances, key=distances.get)
+    if maximum_distance == "right":
+        turn_base(left_motor, right_motor, gyro_sensor, degrees=90)
+        motors_on(left_motor, right_motor, ultrasonic_sensor)
+    elif maximum_distance == "left":
+        turn_base(left_motor, right_motor, gyro_sensor, degrees=-90)
+        motors_on(left_motor, right_motor, ultrasonic_sensor)
+    elif maximum_distance == "front":
+        motors_on(left_motor, right_motor, ultrasonic_sensor)
     
-    ev3.screen.load_image(Image(ImageFile.THUMBS_UP))
-    ev3.light.off()
-    # break
+    loops += 1
 
-distances = measure_3_distances(head_motor, ultrasonic_sensor)
-maximum_distance = max(distances, key=distances.get)
-if maximum_distance == "right":
-    turn_base(left_motor, right_motor, gyro_sensor, degrees=90)
-elif maximum_distance == "left":
-    turn_base(left_motor, right_motor, gyro_sensor, degrees=90)
-elif maximum_distance == "front":
-    motors_on(left_motor, right_motor, ultrasonic_sensor)
+print("End reached.")
+ev3.screen.load_image(Image(ImageFile.THUMBS_UP))
+ev3.light.off()
 
 ################# music
 

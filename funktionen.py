@@ -13,7 +13,8 @@ def measure_3_distances(head_motor, ultrasonic_sensor):
     turn_head(head_motor, degrees=90)
     distances["right"] = ultrasonic_sensor.distance()
     print("Distances are {}.".format(distances))
-    turn_head(head_motor, degrees=-90, wait=False)
+    turn_head(head_motor, degrees=-180, wait=True)
+    # calibrate_ultrasonic(head_motor, ultrasonic_sensor)
     return distances
 
 def turn_base(left_motor, right_motor, gyro_sensor, speed=300, degrees=90, adjustment_turn=False):
@@ -52,22 +53,22 @@ def turn_base(left_motor, right_motor, gyro_sensor, speed=300, degrees=90, adjus
         turn_base(left_motor, right_motor, gyro_sensor, speed=40, degrees=adjustment, adjustment_turn=True)
 
 def motors_on(left_motor, right_motor, ultrasonic_sensor):
-    left_motor.run(-150)
-    right_motor.run(-150)
-    r = 0
-    while(True):
-        distance = ultrasonic_sensor.distance()
-        stop =  distance - 40
-        if stop <= 0:
-            print("Stopped because distance is {}.".format(distance))
-            break
-        wait(50)
-    left_motor.hold()
-    right_motor.hold()
+    left_motor.run_time(-150, time=3800, then=Stop.HOLD, wait=False)
+    right_motor.run_time(-150, time=3800, then=Stop.HOLD)
+    # r = 0
+    # while(True):
+    #     distance = ultrasonic_sensor.distance()
+    #     stop = distance - 40
+    #     if stop <= 0:
+    #         print("Stopped because distance is {}.".format(distance))
+    #         break
+    #     wait(50)
+    # left_motor.hold()
+    # right_motor.hold()
     
 
 def turn_head(head_motor, degrees=90, wait=True):
-    head_motor.run_angle(150, rotation_angle=degrees, wait=wait)
+    head_motor.run_angle(150, rotation_angle=degrees, then=Stop.HOLD, wait=wait)
 
 def calibrate_ultrasonic(head_motor, ultrasonic_sensor):
     # Turn the head in such way that the distance becomes as small as possible between the ultrasonic sensor and the wall.
@@ -105,6 +106,6 @@ def calibrate_ultrasonic(head_motor, ultrasonic_sensor):
 
     rotation_needed = min_angle - head_motor.angle()
     print("Rotating back to minimum angle: {:.2f} degrees".format(min_angle))
-    head_motor.run_angle(speed=150, rotation_angle=rotation_needed, then=Stop.BRAKE)
+    head_motor.run_angle(speed=150, rotation_angle=rotation_needed, then=Stop.HOLD)
 
     print("Calibration complete. Minimum distance: {:.2f} at angle {:.2f}".format(min_distance, min_angle))
