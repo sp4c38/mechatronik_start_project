@@ -138,11 +138,13 @@ def calibrate_ultrasonic(head_motor, ultrasonic_sensor):
     head_motor.run_angle(speed=150, rotation_angle=rotation_needed, then=Stop.HOLD)
     print("Calibration complete. Minimum distance: {:.2f} at angle {:.2f}".format(min_distance, min_angle))
 
-def calibrate_to_field_center(left_motor, right_motor, head_motor, ultrasonic_sensor, gyro_sensor):
-    turn_head(head_motor, degrees=-90)
-    calibrate_ultrasonic(head_motor, ultrasonic_sensor)
-    adjustment_angle = head_motor.angle()+5
-    turn_base(left_motor, right_motor, gyro_sensor, degrees=adjustment_angle)
-    turn_head(head_motor, degrees=-adjustment_angle-40)
-    calibrate_ultrasonic(head_motor, ultrasonic_sensor)
-    turn_head(head_motor, degrees=90)
+# def calibrate_to_field_center(left_motor, right_motor, head_motor, ultrasonic_sensor, gyro_sensor):
+
+
+#     turn_head(head_motor, degrees=-90)
+#     calibrate_ultrasonic(head_motor, ultrasonic_sensor)
+#     adjustment_angle = head_motor.angle()+5
+#     turn_base(left_motor, right_motor, gyro_sensor, degrees=adjustment_angle)
+#     turn_head(head_motor, degrees=-adjustment_angle-40)
+#     calibrate_ultrasonic(head_motor, ultrasonic_sensor)
+#     turn_head(head_motor, degrees=90)

@@ -24,37 +24,37 @@ ultrasonic_sensor = UltrasonicSensor(Port.S3)
 
 calibrate_ultrasonic(head_motor,ultrasonic_sensor)
 
-# while touch_sensor.pressed() == False:
-#     wait(1)
+while touch_sensor.pressed() == False:
+    wait(1)
 
 go_to_start_position(left_motor, right_motor, ultrasonic_sensor, color_sensor, head_motor)
 
-calibrate_to_field_center(left_motor, right_motor, head_motor, ultrasonic_sensor, gyro_sensor)
+# calibrate_to_field_center(left_motor, right_motor, head_motor, ultrasonic_sensor, gyro_sensor)
 
-# reached_dead_end = False
-# while True:
-#     distances = measure_3_distances(head_motor, ultrasonic_sensor)
+reached_dead_end = False
+while True:
+    distances = measure_3_distances(head_motor, ultrasonic_sensor)
    
-#     if all(d < 250 for d in distances.values()):
-#         print("Reached dead end! Moving backward.")
-#         left_motor.run_angle(speed=400,rotation_angle=615,wait=False)
-#         right_motor.run_angle(speed=400,rotation_angle=615,wait=True)
-#         reached_dead_end = True
-#         continue
+    if all(d < 250 for d in distances.values()):
+        print("Reached dead end! Moving backward.")
+        left_motor.run_angle(speed=400,rotation_angle=615,wait=False)
+        right_motor.run_angle(speed=400,rotation_angle=615,wait=True)
+        reached_dead_end = True
+        continue
 
-#     if reached_dead_end:
-#         distances.pop("front")
-#         reached_dead_end = False
+    if reached_dead_end:
+        distances.pop("front")
+        reached_dead_end = False
 
-#     maximum_distance = max(distances, key=distances.get)
-#     if maximum_distance == "right":
-#         turn_base(left_motor, right_motor, gyro_sensor, degrees=90)
-#     elif maximum_distance == "left":
-#         turn_base(left_motor, right_motor, gyro_sensor, degrees=-90)
+    maximum_distance = max(distances, key=distances.get)
+    if maximum_distance == "right":
+        turn_base(left_motor, right_motor, gyro_sensor, degrees=90)
+    elif maximum_distance == "left":
+        turn_base(left_motor, right_motor, gyro_sensor, degrees=-90)
 
-#     finished = motors_on(left_motor, right_motor, ultrasonic_sensor, color_sensor)
-#     if finished:
-#         break
+    finished = motors_on(left_motor, right_motor, ultrasonic_sensor, color_sensor)
+    if finished:
+        break
 
 print("End reached.")
 ev3.screen.load_image(Image(ImageFile.THUMBS_UP))
