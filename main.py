@@ -54,6 +54,12 @@ while True:
 
     finished = motors_on(left_motor, right_motor, ultrasonic_sensor, color_sensor)
     if finished:
+        left_motor.run_angle(100, rotation_angle=-360, wait=False)
+        right_motor.run_angle(100, rotation_angle=-360, wait=True)
+        wait(500)
+        left_motor.run_angle(300, rotation_angle=360, wait=False)
+        right_motor.run_angle(300, rotation_angle=360, wait=True)
+
         break
 
 print("End reached.")
